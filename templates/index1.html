@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="../static/basic.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <title>AIS</title>
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Patua+One&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    body{
+        font-family: 'Patua One', cursive !important;
+
+        /* background: linear-gradient(-45deg, #83FF9C , #32C4C0) !important; */
+        /* background-color:#1c87c9; */
+            background-image: url("/static/images/bg.jpg");
+
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        
+        /* filter: blur(8px); */
+        /* -webkit-filter: blur(8px); */
+        color: white;
+        /* background-size: 400% 400%;; */
+        text-shadow: 9px 4px 10px #000000;
+    }
+
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    #status2{
+        font-weight: 14px;
+    }
+    .box {
+        /* background-color: rgba(255, 255, 255, 0.4); */
+        background-color: rgb(23, 112, 23);
+        border-radius: 10px;
+        /* font-family: sans-serif; */
+        text-align: center;
+        /* line-height: 1; */
+       -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        max-width: 100%;
+        max-height: 100%;
+        padding: 0px 0px;
+        margin: 20px 15% -4% 15%;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
+      
+    .Container {
+        font-family: 'Press Start 2P', cursive;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        width: 1200px;
+        height:400px;
+
+    }
+    .coordinates{
+        font-family: 'Press Start 2P', cursive;
+        color: white;
+    }
+    .mystyle{
+        font-family: 'Press Start 2P', cursive;
+        color:white !important;
+        font-size: 50px !important;
+    }
+    .target{
+        font-family: 'Press Start 2P', cursive;
+        display: block !important;
+        color: white  !important;
+        font-size: 50px !important;
+        margin-left: auto;
+    }
+    .start{
+        font-family: 'Press Start 2P', cursive;
+        display: block !important;
+        color: white  !important;
+        font-size: 50px !important;
+        margin-left: auto;
+    }
+    .record{
+        margin-left: 80%;
+        color: white !important;
+    }
+    .bottom{
+        margin-top: 30px;
+    }
+    #gate {
+        cursor: pointer;
+        margin-bottom: 100px;
+        width: 200px;
+        height: 200px;
+    }
+    #ball {
+        cursor: pointer;
+        width: 100px;
+        height: 50px;
+    }
+    #flag {
+        cursor: pointer;
+        width: 100px;
+        height: 150px;
+    }
+    .formGroup{
+        margin-top:7%;
+    }
+    .form-label {
+        display: block;
+        text-align: center;
+        margin-top:2%;
+        font-size: 19px;
+        /* line-height: 150%; */
+        /* font-size: .85em; */
+    }
+    .buttonHolder{
+        text-align: center;
+    }
+    .btn-info{
+        color: white;
+    }
+    input { 
+        text-align: center; 
+    }
+    .heading{
+        margin: 15px 0px 20px 0px;
+    }
+    th, td {
+        font-family: 'Press Start 2P', cursive;
+        border-collapse:separate;
+        border-spacing:0px;
+
+        border-color: white;
+        border-style:2px  fff !important;
+        border-width:2px;
+    }
+
+    td.selected {
+        /* color: black !important; */
+        background-color:#EDB203;
+    }
+
+    /* Preloder */
+
+#preloder {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999999;
+    /* background: #000; */
+    background: #ffffff;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    border-radius: 60px;
+    animation: loader 0.8s linear infinite;
+    -webkit-animation: loader 0.8s linear infinite;
+}
+
+@keyframes loader {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+        border: 4px solid #056d4d;      
+        /* border: 4px solid #f44336; */
+        border-left-color: transparent;
+    }
+    50% {
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
+        border: 4px solid #056d4d;
+        /* border: 4px solid #673ab7; */
+        border-left-color: transparent;
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+        border: 4px solid #056d4d;
+        border-left-color: transparent;
+    }
+}
+
+@-webkit-keyframes loader {
+    0% {
+        -webkit-transform: rotate(0deg);
+        border: 4px solid #056d4d;
+        border-left-color: transparent;
+    }
+    50% {
+        -webkit-transform: rotate(180deg);
+        border: 4px solid #056d4d;
+        border-left-color: transparent;
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        border: 4px solid #056d4d;
+        border-left-color: transparent;
+    }
+}
+
+    .mutton {
+        display: block;
+        width: 134px;
+        height: 38px;
+        background: #ffffff;
+        padding: 7px;
+        text-align: center;
+        border-radius: 5px;
+        color: black;
+        /* font-weight: bold; */
+        line-height: 25px;
+    }
+    a:hover{
+        color: black;
+    }
+
+    #popupmain{
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background:rgba(0,0,0,0.6);
+        z-index: 1001;
+    }
+    .popup{
+        width: 700px;
+        height:200px;
+        background-image:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('C:\Users\Amandeep\Desktop\flask\flask-app\static\images');
+        background-size: cover;
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%, -50%);
+        box-shadow:2px 2px 3px 3px white;
+        text-align: center;
+    }
+    .headingpopup{
+        transform: translate(50px);
+        color: white;
+    }
+
+    .h2,h2{
+        padding-right: 12%;
+        padding-top: 3%;
+        padding-bottom: 6%;
+    }
+    a:hover{
+        text-decoration:none;
+    }
+    a{
+        text-shadow: none;
+    }
+
+  </style>
+</head>
+<body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <div id="popupmain" style="display:block;">
+        <div class="popup">
+            <h2 class="headingpopup">Select hitting position and hole position</h2>
+            <button id="close" class="btn btn-lg btn-light">Close</button>
+        </div>
+    </div>
+
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+
+        <script>
+            
+            function change(element1) {
+                $(this).addClass('showhidenew');
+                element1 = $(element1);
+                let bbox_rect = element1[0].getBoundingClientRect()
+                let layerX = event.pageX - bbox_rect.left
+                let layerY = event.pageY -bbox_rect.top
+                // console.log(layerX, layerY)
+                elem = document.getElementById('selected')
+                $(elem).val(element1.attr('class'))    
+                $(elem).prop('id', '');
+                elem_name = elem.name
+                if(elem_name=='Hitting Position'){
+                    elem = document.getElementById('hit_cord')
+                    $(elem).val(layerX.toString() + ';' + layerY.toString())
+                    {/* console.log(layerX.toString() + ';' + layerY.toString()) */}
+                } 
+                else
+                {   
+                    elem = document.getElementById('hole_cord')
+                    {/* console.log(layerX.toString() + ';' + layerY.toString()) */}
+                    $(elem).val(layerX.toString() + ';' + layerY.toString())
+                } 
+                // console.log("removed")   
+                // console.log("Clicked on ", element1.attr('class'), elem.attr('class'))       
+            }
+            function changeid(element1)
+            {
+                e = $(element1);;
+                e.prop('id', 'selected');
+                {/* console.log("cfds") */}
+            }
+        </script>
+        <div class="heading">
+            <h1 class="text-center">Streaming video Recorder</h1>
+            <!-- <hr style="width:60%; margin: auto; margin-bottom:5px;"> -->
+            <hr style="width:60%;margin: auto;margin-bottom: 15px;margin-top: 15px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col col-md-7">
+                        <h3 class="text-center float-right">Welcome {{username}}</h3>
+                    </div>
+                    <div class="col col-md-3">
+                        <button type="button" class="btn btn-light float-left" style="border-radius:20px;" data-toggle="modal" data-target="#exampleModalLong">
+                            ?
+                          </button>                        
+                    </div>
+                    <div class="col col-md-2">                     
+                    </div>
+                </div>
+            </div>
+        </div>
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" style="color:black">
+
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style=" text-align: center; "  id="recorder">
+    <a id="download"></a>
+    <script type="text/javascript" src="{{ url_for('static', filename='recorder.js') }}"></script>      
+  </div>
+{%if not img%}
+        <div class="box">
+		<table id="table" style=" margin: auto;">
+            {%for row in range(4)%}
+            <tr>
+                {%for col in range(12)%}
+                <td style=" height: 100px; width: 100px; text-align: center;" class= {{ row*12 + col +1}} onclick="change(this);"> {{ row*12 + col +1 }} </td>
+                {%endfor%}
+            </tr>
+            {%endfor%}
+        </table>
+        </div>
+
+
+
+        <div class="container formGroup">
+            <div class="row">
+                <div class="col">
+                    <div id="preloder">
+                        <div class="loader"></div>
+                    </div>
+                    <form id="myform" action="/form-handler1" method="GET" style="margin-bottom: 3%;">
+                        <!-- Email input -->
+                    <div class="row">
+                        <div class="col-md-2 offset-md-2">
+                        <div class="form-outline mb-4">
+                          <input type="number" onfocus="changeid(this)" name="hittingPosition" id="form1Example1" class="form-control" autofocus />
+                          <label class="form-label" for="form1Example1"> Hitting Position</label>
+                        </div>
+                        </div>
+                        <div class="col-md-2">
+                        <!-- Password input -->
+                        <div class="form-outline mb-4">
+                          <input type="number" onfocus="changeid(this)" name="holePosition" id="form1Example2" class="form-control" />
+                          <label class="form-label" for="form1Example2">Hole Position</label>
+                        </div>
+    
+                        </div>
+    
+                        <div class="col-md-2">
+    
+                        <div class="form-outline mb-4">
+                          <input type="number" step="0.5" name="phi_angle" id="form1Example3" class="form-control" />
+                          <label class="form-label" for="form1Example3">Tilt Left-Right</label>
+                        </div>
+                        </div>
+                        <!-- Password input -->
+                        <div class="col-md-2">
+                        <div class="form-outline mb-4">
+                          <input type="number" step="0.1" name="beta_angle" id="form1Example4" class="form-control" />
+                          <label class="form-label" for="form1Example4">Tilt Up Down</label>
+                        </div>
+                        </div>
+                        </div>
+                        <input type="hidden" id="username" name="username" value={{username}}>
+                        <!-- Submit button -->
+                        <div class="container">
+                            <div class="row">
+                                <div class ="col col-md-3"></div>
+                                <div class ="col col-md-3">
+                                    <div class="buttonHolder">
+                                        <a href="/temp?username={{username}}" class="mutton float-right">Reload</a>
+                                    </div>
+                                </div>
+                                <div class ="col col-md-6">
+                                        <button type="submit" class="btn btn-light" style="color: black;">Submit</button>
+
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>
+                      </form>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+
+        <script>
+
+            $(document).ready(function(){
+                $("#myform").on("submit", function(){
+                  $("#preloder").fadeIn();
+                  console.log("success")
+                });
+                {/* alert("Select hitting position and hole position") */}
+                {/* setTimeout(function(){
+                    $('#popupmain').css('display', 'block');},5000);
+                }) */}
+              });//document ready
+
+              $('#close').click(function(){
+                  $('#popupmain').css('display', 'none');
+              })
+
+        var table = document.querySelector('#table')
+        var selectedCells = table.getElementsByClassName('selected')
+        let flag=true
+        let count=0;
+
+        table.addEventListener('click', function(e) {
+        var td = e.target
+        count++;
+        if (td.tagName !== 'TD') {
+            return
+        }
+        
+
+        
+        if(count<=2){
+            td.className = 'selected'
+        }
+        document.getElementById("form1Example2").focus();
+
+        })
+
+            (function($) { "use strict";
+                    
+            //Page cursors
+    
+            document.getElementsByTagName("body")[0].addEventListener("mousemove", function(n) {
+                t.style.left = n.clientX + "px", 
+                t.style.top = n.clientY + "px", 
+                e.style.left = n.clientX + "px", 
+                e.style.top = n.clientY + "px", 
+                i.style.left = n.clientX + "px", 
+                i.style.top = n.clientY + "px"
+            });
+            var t = document.getElementById("cursor"),
+                e = document.getElementById("cursor2"),
+                i = document.getElementById("cursor3");
+            function n(t) {
+                e.classList.add("hover"), i.classList.add("hover")
+            }
+            function s(t) {
+                e.classList.remove("hover"), i.classList.remove("hover")
+            }
+            s();
+            for (var r = document.querySelectorAll(".hover-target"), a = r.length - 1; a >= 0; a--) {
+                o(r[a])
+            }
+            function o(t) {
+                t.addEventListener("mouseover", n), t.addEventListener("mouseout", s)
+            }
+    
+            //Navigation
+    
+            var app = function () {
+                var body = undefined;
+                var menu = undefined;
+                var menuItems = undefined;
+                var init = function init() {
+                    body = document.querySelector('body');
+                    menu = document.querySelector('.menu-icon');
+                    menuItems = document.querySelectorAll('.nav__list-item');
+                    applyListeners();
+                };
+                var applyListeners = function applyListeners() {
+                    menu.addEventListener('click', function () {
+                        return toggleClass(body, 'nav-active');
+                    });
+                };
+                var toggleClass = function toggleClass(element, stringClass) {
+                    if (element.classList.contains(stringClass)) element.classList.remove(stringClass);else element.classList.add(stringClass);
+                };
+                init();
+            }();
+    
+    
+            //Switch light/dark
+    
+            $("#switch").on('click', function () {
+                if ($("body").hasClass("light")) {
+                    $("body").removeClass("light");
+                    $("#switch").removeClass("switched");
+                }
+                else {
+                    $("body").addClass("light");
+                    $("#switch").addClass("switched");
+                }
+            });
+    
+            })(jQuery); 
+        </script>
+        
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    
+</body>
+</html>

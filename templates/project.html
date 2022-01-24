@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <title>AIS</title>
+    <script type="application/javascript">
+        let column=12;
+        let row =4;
+        let lineWeight =5;
+        let python_data_= {{python_data|tojson }};
+
+        let data_points_upper= {{data_points_upper|tojson }};
+        let data_points_lower= {{data_points_lower|tojson }};
+
+
+        {/* console.log("data_points_lower",data_points_lower) */}
+
+        let hit_x= parseInt(python_data_.hit_x);
+        let hit_y= parseInt(python_data_.hit_y);
+        let hole_x= parseInt(python_data_.hole_x);
+        let hole_y= parseInt(python_data_.hole_y);
+
+        async function draw() {
+          var canvas = document.getElementById('canvas');
+          let color='#CFFFE5';
+          let color2='#ffffff';
+          if (canvas.getContext) {
+            var ctx = canvas.getContext('2d');
+            //adding onClick event to canvas element
+
+            ctx.canvas.addEventListener('mousemove', function(event){
+                var mouseX = event.clientX - ctx.canvas.offsetLeft;
+                var mouseY = event.clientY - ctx.canvas.offsetTop;
+
+                var target = document.getElementById("target");
+                var start = document.getElementById("start");
+
+                var status = document.getElementById('status');
+                status.innerHTML = mouseX+" | "+mouseY;
+                if((mouseX > hole_x && mouseY > hole_y) && (mouseX < hole_x+100 && mouseY < hole_y+100)){
+                    target[0].classList.add("target");
+                }else if((mouseX > hit_x-15 && mouseY > hit_y-15) && (mouseX < hit_x+15 && mouseY < hit_y+15)){
+                    start[0].classList.add("start");
+                }else{
+                    target[0].classList.remove("target");
+                    start[0].classList.remove("start");
+                }
+            });
+
+            ctx.canvas.addEventListener('click', function(event){
+                var mouseX = event.clientX - ctx.canvas.offsetLeft;
+                var mouseY = event.clientY - ctx.canvas.offsetTop;
+                // alert(mouseX+" | "+mouseY);
+                ctx.fillStyle = "orange";
+                ctx.fillRect(mouseX-15, mouseY-15, 30, 30);
+            });
+
+            // curve
+            for(let j=0 ; j< data_points_lower.length; j++){
+                {/* console.log(data_points_lower.length) */}
+                ctx.beginPath();
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[j].initial_X, data_points_lower[j].initial_Y);
+                ctx.lineTo(data_points_lower[j].final_X, data_points_lower[j].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+            for(let k=0 ; k< data_points_upper.length; k++){
+                {/* console.log(data_points_upper.length) */}
+                ctx.beginPath();
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_upper[k].initial_X, data_points_upper[k].initial_Y);
+                ctx.lineTo(data_points_upper[k].final_X, data_points_upper[k].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+
+
+            {/* filling color jugaad */}
+
+            for(let k=0 ; k<60; k+=1){
+                ctx.beginPath();
+                ctx.lineWidth = lineWeight;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[k].initial_X, data_points_lower[k].initial_Y);
+                ctx.lineTo(data_points_upper[k].final_X, data_points_upper[k].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            for(let k=0 ; k<60; k+=1){
+                ctx.beginPath();
+                ctx.lineWidth = lineWeight;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[k].initial_X, data_points_lower[k].initial_Y);
+                ctx.lineTo(data_points_upper[k+1].final_X, data_points_upper[k+1].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+            for(let k=1 ; k<60; k+=1){
+                ctx.beginPath();
+                ctx.lineWidth = lineWeight;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[k].initial_X, data_points_lower[k].initial_Y);
+                ctx.lineTo(data_points_upper[k-1].final_X, data_points_upper[k-1].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            let b=data_points_upper.length;
+            {/* for(let l=1 ; l<60; l+=1){
+                ctx.beginPath();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[l].initial_X, data_points_lower[l].initial_Y);
+                ctx.lineTo(data_points_upper[b -l].final_X, data_points_upper[b -l].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            } */}
+
+            let f=data_points_lower.length;
+            {/* for(let l=1 ; l<60; l+=1){
+                ctx.beginPath();
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[f-l].initial_X, data_points_lower[f-l].initial_Y);
+                ctx.lineTo(data_points_upper[l].final_X, data_points_upper[l].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            } */}
+
+            for(let l=1 ; l<60; l+=1){
+                ctx.beginPath();
+                ctx.lineWidth = lineWeight;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[f-l].initial_X, data_points_lower[f-l].initial_Y);
+                ctx.lineTo(data_points_upper[b-l].final_X, data_points_upper[b-l].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+            for(let l=1 ; l<60; l+=1){
+                ctx.beginPath();
+                ctx.lineWidth = lineWeight;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[f-l].initial_X, data_points_lower[f-l].initial_Y);
+                ctx.lineTo(data_points_upper[b-l-1].final_X, data_points_upper[b-l-1].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+            for(let l=2 ; l<60; l+=1){
+                ctx.beginPath();
+                ctx.lineWidth = lineWeight;
+                ctx.strokeStyle = color;
+                ctx.moveTo(data_points_lower[f-l].initial_X, data_points_lower[f-l].initial_Y);
+                ctx.lineTo(data_points_upper[b-l+1].final_X, data_points_upper[b-l+1].final_Y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            // canvas border 
+
+
+            ctx.lineWidth = 3.0;
+            ctx.strokeStyle = 'white';
+
+            // Stroked triangle
+
+            for(let i=1; i<column; i++){
+
+                ctx.beginPath();
+                ctx.moveTo(100*i, 0);
+                ctx.lineTo(100*i, 400);
+
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            for(let i=1; i<row; i++){
+
+                ctx.beginPath();
+                ctx.moveTo(0,100*i);
+                ctx.lineTo(1200, 100*i);
+
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            {/* var rectangle = new Path2D();
+            ctx.fillStyle = "#91F3FF";
+            rectangle.rect(hole_x, hole_y, 100, 100); */}
+
+            var circle = new Path2D();
+            ctx.fillStyle = "#4361ee";
+            circle.arc(hole_x+50, hole_y+50, 40, 0, 2 * Math.PI);
+
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = "#ef233c";
+            ctx.beginPath();
+            ctx.moveTo(hit_x,hit_y-30);
+            ctx.lineTo(hit_x,hit_y+30);
+            ctx.closePath();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(hit_x-30,hit_y);
+            ctx.lineTo(hit_x+30,hit_y);
+            ctx.closePath();
+            ctx.stroke();
+
+            ctx.fill(circle);
+            {/* ctx.fill(rectangle); */}
+
+
+
+          }
+        }
+
+      </script>
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Patua+One&display=swap');
+        html,
+        body {
+        height: 100%;
+        width: 100%;
+        }
+        body{
+            font-family: 'Patua One', cursive !important;
+
+            /* background: linear-gradient(-180deg, #83FF9C , #32C4C0); */
+            /* animation: gradient 100s ease infinite; */
+            /* background-image: url("/static/images/bg.jpg"); */
+
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+            color: white;
+            /* background-size: 400% 400%;; */
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        #status2{
+            font-weight: 14px;
+        }
+        .box {
+            /* background-color: rgba(255, 255, 255, 0.4);*/
+            background-color: rgb(23, 112, 23);
+            /* border-radius: 10px; */
+            font-family: 'Patua One', cursive !important;
+            text-align: center;
+            line-height: 1;
+           /* -webkit-backdrop-filter: blur(10px); */
+            /* backdrop-filter: blur(10px); */
+            max-width: 100%;
+            max-height: 100%;
+            padding: 0px 0px;
+            margin: 10% 0px 0px 0px;
+            /* box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px; */
+        }
+        .box2 {
+            /* background-color: rgba(255, 255, 255, 0.4); */
+            background-color: rgb(23, 112, 23);
+            /* border-radius: 10px; */
+            /* font-family: sans-serif; */
+            text-align: center;
+            line-height: 1;
+           -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            max-width: 100%;
+            max-height: 100%;
+            padding: 0px 0px;
+            margin: 1% 0px 0px 0px;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        }
+
+        .containeri {
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            width: 1200px;
+            height:400px;
+
+          }
+        .coordinates{
+            /* font-family: 'Press Start 2P', cursive; */
+            font-family: 'Patua One', cursive !important;
+            color: white;
+        }
+        .mystyle{
+            font-family: 'Patua One', cursive !important;
+            color:white !important;
+            font-size: 50px !important;
+        }
+        .target{
+            font-family: 'Patua One', cursive !important;
+            display: block !important;
+            color: white  !important;
+            font-size: 50px !important;
+            margin-left: auto;
+        }
+        .start{
+            font-family: 'Patua One', cursive !important;
+            display: block !important;
+            color: white  !important;
+            font-size: 50px !important;
+            margin-left: auto;
+        }
+        .heading{
+            margin: 15px 0px 20px 0px;
+        }
+        .grid-table{
+            padding-left: 5%;
+        }
+
+    </style>
+
+  </head>
+    <body onload="draw();">
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col grid-table">
+                <canvas class= "box" id="canvas" width="1200" height="400" style="position: absolute; border:5px solid #153131;"></canvas>
+            </div>
+        </div>
+   </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>
